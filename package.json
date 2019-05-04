@@ -1,7 +1,7 @@
 {
-  "name": "discussions",
+  "name": "streams-server",
   "version": "0.0.1",
-  "description": "a backend to manage discussion",
+  "description": "a server to manage stream integrations",
   "engines": {
     "node": ">= 7.0.0"
   },
@@ -17,16 +17,20 @@
     "postinstall": "touch secrets.js",
     "seed": "node script/seed.js",
     "start": "node server",
-    "start-dev":
-      "NODE_ENV='development' NODE_ENV='development' npm run start-server",
-    "start-server":
-      "nodemon server -e html,js,scss --ignore public --ignore client",
-    "test":
-      "NODE_ENV='test' mocha \"./server/**/*.spec.js\" \"./script/**/*.spec.js\" --require @babel/polyfill --require @babel/register"
+    "start-dev": "NODE_ENV='development' npm run start-server",
+    "start-server": "nodemon server -e html,js,scss --ignore public --ignore client",
+    "test": "NODE_ENV='test' mocha \"./server/**/*.spec.js\" \"./script/**/*.spec.js\" --require @babel/polyfill --require @babel/register"
   },
   "lint-staged": {
-    "*.{js}": ["prettier --write", "npm run lint-fix", "git add"],
-    "*.{json,md}": ["prettier --write", "git add"]
+    "*.{js}": [
+      "prettier --write",
+      "npm run lint-fix",
+      "git add"
+    ],
+    "*.{json,md}": [
+      "prettier --write",
+      "git add"
+    ]
   },
   "author": "Fullstack Academy of Code",
   "license": "MIT",
