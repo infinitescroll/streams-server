@@ -1,5 +1,5 @@
-const ImageObject = require('./imageObject')
+const User = require('./user')
 
 module.exports = {
-  ImageObject
+  User,
 }

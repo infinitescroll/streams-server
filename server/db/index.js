@@ -1,7 +1,7 @@
 const models = require('./models')
 
-const { ImageObject } = models
+const { User } = models
 
 module.exports = {
-  ImageObject
+  User,
 }
