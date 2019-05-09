@@ -31,7 +31,24 @@ const registerWebhook = async (thread, userAddress, block, ...files) => {
   const { text } = JSON.parse(fileContent)
   const { type, repo, githubUsername } = JSON.parse(text)
   if (type === 'ADD_WEBHOOK') {
-    console.log('MADE IT!')
+    try {
+      const config = {
+        url: 'http://localhost:3001/api/v0/invite',
+        content_type: 'json'
+      }
+      const data = await axios.post(
+        `https://api.github.com/repos/${githubUsername}/${repo}/hooks`,
+        {
+          events: ['*'],
+          config,
+          name: 'web',
+          active: true
+        }
+      )
+      console.log('REGISTERD', data)
+    } catch (err) {
+      console.log('ERR', err)
+    }
   }
   return
 }
