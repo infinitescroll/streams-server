@@ -7,7 +7,7 @@ const { textile } = require('../../textile')
 const {
   GITHUB_CLIENT_ID,
   GITHUB_CLIENT_SECRET,
-  GITHUB_CALLBACK_URL,
+  GITHUB_CALLBACK_URL
 } = require('../../../secrets')
 
 module.exports = router
@@ -17,7 +17,7 @@ passport.use(
     {
       clientID: GITHUB_CLIENT_ID,
       clientSecret: GITHUB_CLIENT_SECRET,
-      callbackURL: GITHUB_CALLBACK_URL,
+      callbackURL: GITHUB_CALLBACK_URL
     },
     (accessToken, refreshToken, profile, cb) => {
       return cb(null, { ...profile, accessToken, refreshToken })
