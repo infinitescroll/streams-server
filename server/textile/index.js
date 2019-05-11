@@ -25,45 +25,49 @@ const registerInviteListener = () => {
   }, 5000)
 }
 
+const registerGithubWH = async ({
+  data: { repo, githubUsername, webhookEvents }
+}) => {
+  try {
+    const config = {
+      url: 'http://localhost:3001/api/v0/invite',
+      content_type: 'json'
+    }
+    const data = await axios.post(
+      `https://api.github.com/repos/${githubUsername}/${repo}/hooks`,
+      {
+        events: webhookEvents,
+        config,
+        name: 'web',
+        active: true
+      }
+    )
+    console.log('REGISTERD', data)
+    return data
+  } catch (err) {
+    console.log('ERR', err)
+  }
+}
+
 const registerWebhook = async (thread, userAddress, block, ...files) => {
   const [content] = files[0]
   const fileContent = await textile.file.content(content.file.hash)
   const { type } = JSON.parse(fileContent)
-  if (type === 'ADD_GITHUB_WEBHOOK') {
-    const { data: { repo, githubUsername, webhookEvents } } = JSON.parse(
-      fileContent
-    )
-    try {
-      const config = {
-        url: 'http://localhost:3001/api/v0/invite',
-        content_type: 'json'
-      }
-      const data = await axios.post(
-        `https://api.github.com/repos/${githubUsername}/${repo}/hooks`,
-        {
-          events: webhookEvents,
-          config,
-          name: 'web',
-          active: true
-        }
-      )
-      console.log('REGISTERD', data)
-    } catch (err) {
-      console.log('ERR', err)
-    }
-  }
+  let webhook
+  if (type === 'ADD_GITHUB_WEBHOOK')
+    webhook = await registerGithubWH(JSON.parse(fileContent))
   return
 }
 
 const registerThreadListener = async () => {
   const readableStream = await textile.subscribe.stream(['files'])
   const reader = readableStream.getReader()
-  const read = result => {
+  const read = async result => {
     if (result.done) return
     try {
       const { thread, payload } = result.value
       const { files, user, block } = payload
-      const webhook = registerWebhook(thread, user.address, block, files)
+      const webhook = await registerWebhook(thread, user.address, block, files)
     } catch (err) {
       reader.cancel()
       return
