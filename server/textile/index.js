@@ -77,7 +77,21 @@ const registerThreadListener = async () => {
   reader.read().then(read)
 }
 
+const storeAccessToken = async (accessToken, application, webhookThreadId) => {
+  await textile.files.add(
+    JSON.stringify({
+      type: 'RECEIVED_GITHUB_ACCESS_TOKEN',
+      data: {
+        accessToken,
+        application
+      }
+    }),
+    `Your access token for: ${application}`,
+    webhookThreadId
+  )
+}
+
 // registerInviteListener()
 registerThreadListener()
 
-module.exports = { textile }
+module.exports = { textile, storeAccessToken }

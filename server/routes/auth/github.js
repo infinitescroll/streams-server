@@ -2,7 +2,7 @@ const router = require('express').Router()
 const GitHubStrategy = require('passport-github').Strategy
 const passport = require('passport')
 
-const { textile } = require('../../textile')
+const { storeAccessToken } = require('../../textile')
 
 const {
   GITHUB_CLIENT_ID,
@@ -25,19 +25,12 @@ passport.use(
   )
 )
 
-router.get(
-  '/callback',
-  passport.authenticate('github'),
-  async (req, res, next) => {
-    const { accessToken, refreshToken } = req.user
-    delete req.user.accessToken
-    delete req.user.refreshToken
+router.get('/callback', passport.authenticate('github'), async (req, res) => {
+  const { accessToken } = req.user
+  delete req.user.accessToken
+  delete req.user.refreshToken
 
-    const { streamId } = req.query
-
-    const threads = await textile.threads.list()
-    console.log(threads, streamId, accessToken, refreshToken)
-
-    res.sendStatus(200)
-  }
-)
+  const { streamId } = req.query
+  await storeAccessToken(accessToken, 'github', streamId)
+  res.sendStatus(201)
+})
