@@ -64,6 +64,11 @@ const registerGithubWH = async (
         config,
         name: 'web',
         active: true
+      },
+      {
+        headers: {
+          Authorization: `token ${accessToken}`
+        }
       }
     )
     return data
