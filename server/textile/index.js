@@ -1,6 +1,10 @@
 const { Textile } = require('@textile/js-http-client')
 const axios = require('axios')
 
+const types = {
+  github: 'STORE_GITHUB_ACCESS_TOKEN'
+}
+
 const textile = new Textile({
   url: 'http://127.0.0.1',
   port: 40600,
@@ -10,6 +14,11 @@ const textile = new Textile({
     }
   }
 })
+
+const parseFile = async data => {
+  const fileContent = await textile.file.content(data.file.hash)
+  return JSON.parse(fileContent)
+}
 
 const registerInviteListener = () => {
   setTimeout(async () => {
@@ -25,9 +34,24 @@ const registerInviteListener = () => {
   }, 5000)
 }
 
-const registerGithubWH = async ({
-  data: { repo, githubUsername, webhookEvents }
-}) => {
+const fetchAccessToken = async (application, webhookThreadId) => {
+  const { items } = await textile.files.list(webhookThreadId, 0, 100)
+  const blocks = await Promise.all(
+    items.map(async block => parseFile(block.files[0]))
+  )
+  const blocksWithToken = blocks.filter(
+    ({ type }) => types[application] === type
+  )
+  return blocksWithToken.length > 0
+    ? blocksWithToken[blocksWithToken.length - 1].data.accessToken
+    : null
+}
+
+const registerGithubWH = async (
+  webhookThreadId,
+  { data: { repo, githubUsername, webhookEvents } }
+) => {
+  const accessToken = await fetchAccessToken('github', webhookThreadId)
   try {
     const config = {
       url: 'http://localhost:3001/api/v0/invite',
@@ -42,21 +66,23 @@ const registerGithubWH = async ({
         active: true
       }
     )
-    console.log('REGISTERD', data)
     return data
   } catch (err) {
-    console.log('ERR', err)
+    throw new Error(err)
   }
 }
 
-const registerWebhook = async (thread, userAddress, block, ...files) => {
-  const [content] = files[0]
-  const fileContent = await textile.file.content(content.file.hash)
-  const { type } = JSON.parse(fileContent)
+const registerWebhook = async (thread, userAddress, block, file) => {
+  const fileContent = await parseFile(file)
+
   let webhook
-  if (type === 'ADD_GITHUB_WEBHOOK')
-    webhook = await registerGithubWH(JSON.parse(fileContent))
-  return
+  try {
+    if (fileContent.type === 'ADD_GITHUB_WEBHOOK')
+      webhook = await registerGithubWH(thread, fileContent)
+  } catch (error) {
+    throw new Error(error)
+  }
+  return webhook
 }
 
 const registerThreadListener = async () => {
@@ -67,7 +93,13 @@ const registerThreadListener = async () => {
     try {
       const { thread, payload } = result.value
       const { files, user, block } = payload
-      const webhook = await registerWebhook(thread, user.address, block, files)
+      // TODO: handle multiple files (don't hardcode [0])
+      const webhook = await registerWebhook(
+        thread,
+        user.address,
+        block,
+        files[0]
+      )
     } catch (err) {
       reader.cancel()
       return
@@ -80,7 +112,7 @@ const registerThreadListener = async () => {
 const storeAccessToken = async (accessToken, application, webhookThreadId) => {
   await textile.files.add(
     JSON.stringify({
-      type: 'RECEIVED_GITHUB_ACCESS_TOKEN',
+      type: 'STORE_GITHUB_ACCESS_TOKEN',
       data: {
         accessToken,
         application
