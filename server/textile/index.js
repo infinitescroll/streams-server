@@ -26,11 +26,13 @@ const registerInviteListener = () => {
 }
 
 const registerWebhook = async (thread, userAddress, block, ...files) => {
-  const [data] = files[0]
-  const fileContent = await textile.file.content(data.file.hash)
-  const { text } = JSON.parse(fileContent)
-  const { type, repo, githubUsername } = JSON.parse(text)
-  if (type === 'ADD_WEBHOOK') {
+  const [content] = files[0]
+  const fileContent = await textile.file.content(content.file.hash)
+  const { type } = JSON.parse(fileContent)
+  if (type === 'ADD_GITHUB_WEBHOOK') {
+    const { data: { repo, githubUsername, webhookEvents } } = JSON.parse(
+      fileContent
+    )
     try {
       const config = {
         url: 'http://localhost:3001/api/v0/invite',
@@ -39,7 +41,7 @@ const registerWebhook = async (thread, userAddress, block, ...files) => {
       const data = await axios.post(
         `https://api.github.com/repos/${githubUsername}/${repo}/hooks`,
         {
-          events: ['*'],
+          events: webhookEvents,
           config,
           name: 'web',
           active: true
@@ -62,7 +64,6 @@ const registerThreadListener = async () => {
       const { thread, payload } = result.value
       const { files, user, block } = payload
       const webhook = registerWebhook(thread, user.address, block, files)
-      // console.log(thread, payload, body)
     } catch (err) {
       reader.cancel()
       return
