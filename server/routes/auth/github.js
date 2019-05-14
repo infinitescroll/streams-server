@@ -25,12 +25,16 @@ passport.use(
   )
 )
 
-router.get('/callback', passport.authenticate('github'), async (req, res) => {
+router.post('/callback', passport.authenticate('github'), async (req, res) => {
   const { accessToken } = req.user
   delete req.user.accessToken
   delete req.user.refreshToken
 
-  const { streamId } = req.query
-  await storeAccessToken(accessToken, 'github', streamId)
-  res.sendStatus(201)
+  const { peerId } = req.query
+  try {
+    await storeAccessToken(accessToken, 'github', peerId)
+    res.sendStatus(201)
+  } catch (error) {
+    next(error)
+  }
 })

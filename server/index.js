@@ -2,9 +2,9 @@ const path = require('path')
 const express = require('express')
 const passport = require('passport')
 const session = require('express-session')
+const cors = require('cors')
 const morgan = require('morgan')
 const compression = require('compression')
-const fileUpload = require('express-fileupload')
 const mongoose = require('mongoose')
 const PORT = process.env.PORT || 3001
 const app = express()
@@ -40,11 +40,13 @@ const createApp = () => {
   // logging middleware
   app.use(morgan('dev'))
 
+  // cors middleware
+  app.use(cors())
+
   // body parsing middleware
   app.use(express.json())
 
   app.use(express.urlencoded({ extended: true }))
-  app.use(fileUpload())
 
   // compression middleware
   app.use(compression())
@@ -54,7 +56,7 @@ const createApp = () => {
     session({
       secret: 'my best friend is Cody',
       resave: true,
-      saveUninitialized: true,
+      saveUninitialized: true
     })
   )
 

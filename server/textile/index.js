@@ -1,5 +1,6 @@
 const { Textile } = require('@textile/js-http-client')
 const axios = require('axios')
+const streamEventSchema = require('./streamEventSchema')
 
 const types = {
   github: 'STORE_GITHUB_ACCESS_TOKEN'
@@ -14,6 +15,17 @@ const textile = new Textile({
     }
   }
 })
+
+const createWebhookThread = async peerId => {
+  const { hash } = await textile.schemas.add(streamEventSchema)
+  return textile.threads.add(
+    `${peerId}-webhooks`,
+    hash,
+    null,
+    'private',
+    'invite_only'
+  )
+}
 
 const parseFile = async data => {
   const fileContent = await textile.file.content(data.file.hash)
@@ -114,7 +126,17 @@ const registerThreadListener = async () => {
   reader.read().then(read)
 }
 
-const storeAccessToken = async (accessToken, application, webhookThreadId) => {
+const getWebhookThreadId = async peerId => {
+  const threads = await textile.threads.getByName(`${peerId}-webhooks`)
+  if (threads.length === 0) {
+    throw new Error(`No webhook thread configured for peerId: ${peerId}`)
+  }
+  const { id } = threads[0]
+  return id
+}
+
+const storeAccessToken = async (accessToken, application, peerId) => {
+  const id = await getWebhookThreadId(peerId)
   await textile.files.add(
     JSON.stringify({
       type: 'STORE_GITHUB_ACCESS_TOKEN',
@@ -124,11 +146,11 @@ const storeAccessToken = async (accessToken, application, webhookThreadId) => {
       }
     }),
     `Your access token for: ${application}`,
-    webhookThreadId
+    id
   )
 }
 
 // registerInviteListener()
 registerThreadListener()
 
-module.exports = { textile, storeAccessToken }
+module.exports = { textile, storeAccessToken, createWebhookThread }
