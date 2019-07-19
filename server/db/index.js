@@ -1,7 +1,7 @@
 const models = require('./models')
 
-const { User } = models
-
+const { Event } = models
+console.log('setting up')
 module.exports = {
-  User,
+  Event
 }

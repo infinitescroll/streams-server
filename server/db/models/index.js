@@ -1,5 +1,6 @@
-const User = require('./user')
+const Event = require('./event')
 
+console.log('settnig up')
 module.exports = {
-  User,
+  Event
 }

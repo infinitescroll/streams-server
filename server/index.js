@@ -8,6 +8,7 @@ const compression = require('compression')
 const mongoose = require('mongoose')
 const PORT = process.env.PORT || 3001
 const app = express()
+const Event = require('./db/models/event')
 module.exports = app
 
 // // This is a global Mocha hook, used for resource cleanup.
@@ -94,14 +95,46 @@ const startDb = () => {
   const db = mongoose.connection
   db.on('error', console.error.bind(console, 'connection error:'))
   db.once('open', async () => {
+    ensureTheresData()
     await createApp()
     await startListening()
   })
 }
 
+function ensureTheresData() {
+  Event.find(function(error, doc) {
+    if (error) {
+      console.log('error', error)
+    } else if (doc.length < 1) {
+      Event.fetchGitHubEvents()
+        .then(res => {
+          // put this in the schema file
+          Event.insertMany(res, function(error, docs) {
+            if (error) console.log(error)
+            else console.log('saved ', docs.length)
+          })
+        })
+        .catch(error => {
+          console.log('error', error)
+        })
+
+      Event.fetchTrelloEvents()
+        .then(res => {
+          // put this in the schema file
+          Event.insertMany(res, function(error, docs) {
+            if (error) console.log(error)
+            else console.log('saved ', docs.length)
+          })
+        })
+        .catch(error => {
+          console.log('error', error)
+        })
+    }
+  })
+}
+
 async function bootApp() {
-  await createApp()
-  await startListening()
+  startDb()
 }
 // This evaluates as true when this file is run directly from the command line,
 // i.e. when we say 'node server/index.js' (or 'nodemon server/index.js', or 'nodemon server', etc)

@@ -2,8 +2,6 @@ const router = require('express').Router()
 const GitHubStrategy = require('passport-github').Strategy
 const passport = require('passport')
 
-const { storeAccessToken } = require('../../textile')
-
 const {
   GITHUB_CLIENT_ID,
   GITHUB_CLIENT_SECRET,
@@ -32,7 +30,6 @@ router.post('/callback', passport.authenticate('github'), async (req, res) => {
 
   const { peerId } = req.query
   try {
-    await storeAccessToken(accessToken, 'github', peerId)
     res.sendStatus(201)
   } catch (error) {
     next(error)
