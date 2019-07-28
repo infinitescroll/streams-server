@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const { Schema } = mongoose
+const { verifyJWT } = require('../../utils')
 
 const userSchema = new Schema({
   email: {
@@ -12,18 +13,21 @@ const userSchema = new Schema({
   }
 })
 
-userSchema.statics.findOrCreate = function(id, data, callback) {
-  const self = this
-  self.findById(id, (err, user) => {
-    if (err) callback(err, null)
-    else if (user) callback(null, user)
-    else {
-      self.create(data, function(error, createdUser) {
-        if (err) callback(error, null)
-        else callback(null, createdUser)
-      })
-    }
-  })
+class UserClass {
+  static async findOrCreate(email) {
+    const user = await this.findOne({ email })
+    if (user) return user
+
+    const newUser = await this.create({ email })
+    return newUser
+  }
+
+  static async findByJWT(jwt) {
+    const { sub } = await verifyJWT(jwt)
+    return this.findById(sub)
+  }
 }
+
+userSchema.loadClass(UserClass)
 
 module.exports = mongoose.model('Users', userSchema)

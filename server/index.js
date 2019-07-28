@@ -49,6 +49,8 @@ const createApp = () => {
     })
   )
 
+  app.use(require('./middleware').serializeUser)
+
   app.use('/api/v0', require('./routes'))
 
   // any remaining requests with an extension (.js, .css, etc.) send 404
