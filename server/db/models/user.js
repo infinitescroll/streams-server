@@ -2,12 +2,14 @@ const mongoose = require('mongoose')
 const { Schema } = mongoose
 
 const userSchema = new Schema({
-  _id: String,
-  '@context': {
+  email: {
     type: String,
-    required: true,
-  },
-  githubId: String,
+    lowercase: true,
+    unique: true,
+    required: [true, "can't be blank"],
+    match: [/\S+@\S+\.\S+/, 'is invalid'],
+    index: true
+  }
 })
 
 userSchema.statics.findOrCreate = function(id, data, callback) {

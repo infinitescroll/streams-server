@@ -1,6 +1,5 @@
 const path = require('path')
 const express = require('express')
-const passport = require('passport')
 const session = require('express-session')
 const cors = require('cors')
 const morgan = require('morgan')
@@ -26,16 +25,6 @@ module.exports = app
  */
 if (process.env.NODE_ENV !== 'production') require('../secrets')
 
-// passport registration
-passport.serializeUser(({ id }, cb) => {
-  cb(null, id)
-})
-
-passport.deserializeUser((obj, cb) => {
-  console.log('DESERIALIZE', obj)
-  cb(null, obj)
-})
-
 const createApp = () => {
   // logging middleware
   app.use(morgan('dev'))
@@ -59,10 +48,6 @@ const createApp = () => {
       saveUninitialized: true
     })
   )
-
-  // session middleware with passport
-  app.use(passport.initialize())
-  app.use(passport.session())
 
   app.use('/api/v0', require('./routes'))
 
@@ -90,7 +75,7 @@ const startListening = () => {
 }
 
 const startDb = () => {
-  mongoose.connect('mongodb://localhost/pinning', { useNewUrlParser: true })
+  mongoose.connect('mongodb://localhost/streamsDB', { useNewUrlParser: true })
   const db = mongoose.connection
   db.on('error', console.error.bind(console, 'connection error:'))
   db.once('open', async () => {
@@ -100,8 +85,7 @@ const startDb = () => {
 }
 
 async function bootApp() {
-  await createApp()
-  await startListening()
+  await startDb()
 }
 // This evaluates as true when this file is run directly from the command line,
 // i.e. when we say 'node server/index.js' (or 'nodemon server/index.js', or 'nodemon server', etc)
