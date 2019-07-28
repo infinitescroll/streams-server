@@ -30,8 +30,7 @@ const sendTokenizedEmail = async (to, token) => {
 const jwtOptions = {
   issuer: 'streams.re',
   audience: 'streams.re',
-  algorithm: 'HS256',
-  expiresIn: '5m'
+  algorithm: 'HS256'
 }
 
 const generateLoginCode = user =>
