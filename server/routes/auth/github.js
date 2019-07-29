@@ -10,7 +10,7 @@ router.get(
   function(req, res, next) {
     if (!req.user || !req.user._id) return res.status(400).send('No user found')
     const callbackURL =
-      'http://localhost:3001/api/v0/auth/github/callback?_id=' + req.user.id
+      'http://localhost:3001/api/v0/auth/github/callback?_id=' + req.user._id
 
     passport.use(
       new GitHubStrategy(
