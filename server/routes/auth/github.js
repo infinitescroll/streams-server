@@ -44,7 +44,7 @@ router.get(
           callbackURL: 'http://localhost:3001/api/v0/auth/github/callback'
         },
         function(accessToken, refreshToken, profile, cb) {
-          if (!req.query._id) return res.send('No user found')
+          if (!req.query._id) return res.send('No user in request')
 
           User.findOne({ _id: req.query._id }, (err, user) => {
             if (err) res.status(500).send(err)
