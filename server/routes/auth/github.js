@@ -8,11 +8,9 @@ module.exports = router
 router.get(
   '/',
   function(req, res, next) {
-    if (!req.user || !req.user.id) {
-      return res.status(400).send('No user found')
-    }
+    if (!req.user || !req.user._id) return res.status(400).send('No user found')
     const callbackURL =
-      'http://localhost:3001/api/v0/auth/github/callback?id=' + req.user.id
+      'http://localhost:3001/api/v0/auth/github/callback?_id=' + req.user.id
 
     passport.use(
       new GitHubStrategy(
@@ -26,11 +24,12 @@ router.get(
         }
       )
     )
+
     next()
   },
   passport.authenticate('github', {
-    successRedirect: '/',
-    failureRedirect: '/error'
+    successRedirect: '/success',
+    failureRedirect: '/failure'
   })
 )
 
@@ -45,10 +44,11 @@ router.get(
           callbackURL: 'http://localhost:3001/api/v0/auth/github/callback'
         },
         function(accessToken, refreshToken, profile, cb) {
-          if (!req.query.id) return res.send('No user found')
+          if (!req.query._id) return res.send('No user found')
 
-          User.findOne({ _id: req.query.id }, (err, user) => {
+          User.findOne({ _id: req.query._id }, (err, user) => {
             if (err) res.status(500).send(err)
+            if (!user) res.status(404).send()
 
             user.apps.github = {
               profile,
@@ -62,10 +62,11 @@ router.get(
         }
       )
     )
+
     next()
   },
   passport.authenticate('github', {
-    successRedirect: '/',
-    failureRedirect: '/error'
+    successRedirect: '/success',
+    failureRedirect: '/failure'
   })
 )
