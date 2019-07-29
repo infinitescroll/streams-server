@@ -5,6 +5,7 @@ const cors = require('cors')
 const morgan = require('morgan')
 const compression = require('compression')
 const mongoose = require('mongoose')
+const passport = require('passport')
 const PORT = process.env.PORT || 3001
 const app = express()
 module.exports = app
@@ -48,6 +49,17 @@ const createApp = () => {
       saveUninitialized: true
     })
   )
+
+  app.use(passport.initialize())
+  app.use(passport.session())
+
+  passport.serializeUser(function(user, done) {
+    done(null, user.id)
+  })
+
+  passport.deserializeUser(function(id, done) {
+    done(null, { id })
+  })
 
   app.use(require('./middleware').serializeUser)
 

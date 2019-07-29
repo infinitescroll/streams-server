@@ -10,6 +10,22 @@ const userSchema = new Schema({
     required: [true, "can't be blank"],
     match: [/\S+@\S+\.\S+/, 'is invalid'],
     index: true
+  },
+  apps: {
+    github: {
+      username: {
+        type: String
+      },
+      accessToken: {
+        type: String
+      },
+      refreshToken: {
+        type: String
+      },
+      profile: {
+        type: Object
+      }
+    }
   }
 })
 
