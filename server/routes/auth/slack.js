@@ -23,7 +23,6 @@ router.get('/callback', function(req, res) {
       return res.status(400).send('No dice')
     }
 
-    console.log('in here')
     User.findOne({ _id: req.user._id }, (err, user) => {
       if (err) res.status(500).send(err)
       if (!user) res.status(404).send()
