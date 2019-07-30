@@ -39,6 +39,20 @@ const userSchema = new Schema({
       profile: {
         type: Object
       }
+    },
+    arena: {
+      username: {
+        type: String
+      },
+      accessToken: {
+        type: String
+      },
+      refreshToken: {
+        type: String
+      },
+      profile: {
+        type: Object
+      }
     }
   }
 })
