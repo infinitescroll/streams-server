@@ -14,8 +14,7 @@ router.get('/callback', function(req, res) {
     '&client_secret=' +
     SLACK_CLIENT_SECRET +
     '&code=' +
-    req.query.code +
-    '&redirect_uri=http://localhost:3001/api/v0/auth/slack/callback'
+    req.query.code
 
   request(url, function(error, response, body) {
     if (error) return res.status(400).send(error)
@@ -24,6 +23,7 @@ router.get('/callback', function(req, res) {
       return res.status(400).send('No dice')
     }
 
+    console.log('in here')
     User.findOne({ _id: req.user._id }, (err, user) => {
       if (err) res.status(500).send(err)
       if (!user) res.status(404).send()
