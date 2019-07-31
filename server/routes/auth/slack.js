@@ -22,20 +22,15 @@ router.put('/', fetchUserFromJwt, (req, res, next) => {
       return res.status(400).send('No dice')
     }
 
-    User.findOne({ _id: req.user._id }, (err, user) => {
-      if (err) return next(err)
-      if (!user) res.status(404).send()
+    req.user.apps.slack = {
+      profile: body.user,
+      username: body.user.name,
+      accessToken: body.access_token
+    }
 
-      user.apps.slack = {
-        profile: body.user,
-        username: body.user.name,
-        accessToken: body.access_token
-      }
-
-      user
-        .save()
-        .then(obj => res.status(204).send(obj))
-        .catch(err => res.status(400).send(err))
-    })
+    req.user
+      .save()
+      .then(obj => res.status(204).send(obj))
+      .catch(err => res.status(400).send(err))
   })
 })

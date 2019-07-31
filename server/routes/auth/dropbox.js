@@ -32,19 +32,14 @@ router.put('/', fetchUserFromJwt, (req, res, next) => {
         return res.status(400).send('No dice')
       }
 
-      User.findOne({ _id: req.user._id }, (err, user) => {
-        if (err) return next(err)
-        if (!user) return res.status(400).send('No user found')
+      req.user.apps.dropbox = {
+        accessToken: body.access_token
+      }
 
-        user.apps.dropbox = {
-          accessToken: body.access_token
-        }
-
-        user
-          .save()
-          .then(obj => res.status(204).send(obj))
-          .catch(err => next(err))
-      })
+      req.user
+        .save()
+        .then(obj => res.status(204).send(obj))
+        .catch(err => next(err))
     }
   )
 })
