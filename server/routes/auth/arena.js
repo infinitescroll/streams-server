@@ -21,19 +21,13 @@ router.put('/', fetchUserFromJwt, (req, res, next) => {
     if (!body || !body.access_token || body.error) {
       return res.status(400).send('No dice')
     }
+    req.user.apps.arena = {
+      accessToken: body.access_token
+    }
 
-    User.findOne({ _id: req.user._id }, (err, user) => {
-      if (err) return next(err)
-      if (!user) return res.status(404).send()
-
-      user.apps.arena = {
-        accessToken: body.access_token
-      }
-
-      user
-        .save()
-        .then(obj => res.status(204).send(obj))
-        .catch(err => next(err))
-    })
+    req.user
+      .save()
+      .then(obj => res.status(204).send(obj))
+      .catch(err => next(err))
   })
 })
