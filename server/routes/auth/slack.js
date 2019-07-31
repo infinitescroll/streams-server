@@ -5,7 +5,7 @@ const { User } = require('../../db')
 module.exports = router
 
 router.get('/callback', function(req, res) {
-  if (!req.user || !req.user._id) return res.status(400).send('No user')
+  if (!req.query.u) return res.status(400).send('No user')
   if (!req.query.code) return res.status(400).send('No code')
 
   const url =
@@ -14,16 +14,18 @@ router.get('/callback', function(req, res) {
     '&client_secret=' +
     SLACK_CLIENT_SECRET +
     '&code=' +
-    req.query.code
+    req.query.code +
+    '&redirect_uri=http://localhost:3001/api/v0/auth/slack/callback?u=' +
+    req.query.u
 
   request(url, function(error, response, body) {
     if (error) return res.status(400).send(error)
     body = JSON.parse(body)
-    if (!body || !body.access_token || !req.user || !req.user._id) {
+    if (!body || !body.access_token || !req.query.u) {
       return res.status(400).send('No dice')
     }
 
-    User.findOne({ _id: req.user._id }, (err, user) => {
+    User.findOne({ _id: req.query.u }, (err, user) => {
       if (err) res.status(500).send(err)
       if (!user) res.status(404).send()
       if (!user.apps) user.apps = {}
@@ -37,7 +39,6 @@ router.get('/callback', function(req, res) {
       user
         .save()
         .then(obj => {
-          console.log('obj', obj)
           res.redirect('/sucess')
         })
         .catch(err => {
