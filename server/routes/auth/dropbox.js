@@ -5,7 +5,7 @@ const { User } = require('../../db')
 module.exports = router
 
 router.get('/callback', function(req, res) {
-  if (!req.user || !req.user._id) return res.status(400).send('No user')
+  if (!req.query || !req.query.state) return res.status(400).send('No user')
   if (!req.query.code) return res.status(400).send('No code')
   const url = 'https://api.dropbox.com/oauth2/token'
 
@@ -29,11 +29,11 @@ router.get('/callback', function(req, res) {
     },
     function(error, response, body) {
       if (error) return res.status(400).send(error)
-      if (!body || !body.access_token || !req.user || !req.user._id) {
+      if (!body || !body.access_token) {
         return res.status(400).send('No dice')
       }
 
-      User.findOne({ _id: req.user._id }, (err, user) => {
+      User.findOne({ _id: req.query.state }, (err, user) => {
         if (err) res.status(500).send(err)
         if (!user) res.status(404).send()
         if (!user.apps) user.apps = {}

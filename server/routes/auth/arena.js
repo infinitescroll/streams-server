@@ -16,7 +16,7 @@ router.get('/callback', function(req, res) {
     '&client_secret=' +
     ARENA_CLIENT_SECRET +
     '&code=' +
-    '<for local testing, arena gives codes in the frontend auth process>' +
+    '<auth code received after authenticating on frontend>' +
     '&grant_type=authorization_code&redirect_uri=urn:ietf:wg:oauth:2.0:oob'
 
   request.post(url, {}, function(error, response, body) {
