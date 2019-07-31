@@ -35,7 +35,7 @@ router.get('/', (req, res) => {
 
       User.findOne({ _id: req.user._id }, (err, user) => {
         if (err) res.status(500).send(err)
-        if (!user) res.status(404).send()
+        if (!user) res.status(400).send('No user found')
         if (!user.apps) user.apps = {}
 
         user.apps.dropbox = {
@@ -45,10 +45,10 @@ router.get('/', (req, res) => {
         user
           .save()
           .then(obj => {
-            res.redirect('/sucess')
+            res.status(200).send(obj)
           })
           .catch(err => {
-            res.redirect('/error')
+            res.status(400).send(err)
           })
       })
     }

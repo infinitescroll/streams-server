@@ -38,10 +38,10 @@ router.get('/', (req, res) => {
       user
         .save()
         .then(obj => {
-          res.redirect('/sucess')
+          res.status(200).send(obj)
         })
         .catch(err => {
-          res.redirect('/error')
+          res.status(400).send(err)
         })
     })
   })
