@@ -4,11 +4,9 @@ const { ARENA_CLIENT_ID, ARENA_CLIENT_SECRET } = require('../../../secrets')
 const { User } = require('../../db')
 module.exports = router
 
-router.get('/callback', function(req, res) {
+router.get('/', function(req, res) {
   if (!req.user || !req.user._id) return res.status(400).send('No user')
-
-  // we'll use this check for the deployed version
-  // if (!req.query.code) return res.status(400).send('No code')
+  if (!req.query.code) return res.status(400).send('No code')
 
   const url =
     'https://dev.are.na/oauth/token?client_id=' +
@@ -16,7 +14,7 @@ router.get('/callback', function(req, res) {
     '&client_secret=' +
     ARENA_CLIENT_SECRET +
     '&code=' +
-    '<auth code received after authenticating on frontend>' +
+    req.query.code +
     '&grant_type=authorization_code&redirect_uri=urn:ietf:wg:oauth:2.0:oob'
 
   request.post(url, {}, function(error, response, body) {
