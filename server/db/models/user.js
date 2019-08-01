@@ -12,6 +12,20 @@ const userSchema = new Schema({
     index: true
   },
   apps: {
+    trello: {
+      username: {
+        type: String
+      },
+      accessToken: {
+        type: String
+      },
+      refreshToken: {
+        type: String
+      },
+      profile: {
+        type: Object
+      }
+    },
     slack: {
       username: {
         type: String
