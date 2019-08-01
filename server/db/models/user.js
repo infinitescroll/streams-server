@@ -53,6 +53,20 @@ const userSchema = new Schema({
       profile: {
         type: Object
       }
+    },
+    github: {
+      username: {
+        type: String
+      },
+      accessToken: {
+        type: String
+      },
+      refreshToken: {
+        type: String
+      },
+      profile: {
+        type: Object
+      }
     }
   }
 })

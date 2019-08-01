@@ -1,7 +1,6 @@
 const router = require('express').Router()
 const request = require('request')
 const { SLACK_CLIENT_ID, SLACK_CLIENT_SECRET } = require('../../../secrets')
-const { User } = require('../../db')
 const { fetchUserFromJwt } = require('../../middleware')
 module.exports = router
 

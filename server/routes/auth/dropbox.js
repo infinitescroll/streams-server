@@ -1,7 +1,6 @@
 const router = require('express').Router()
 const request = require('request')
 const { DROPBOX_CLIENT_ID, DROPBOX_CLIENT_SECRET } = require('../../../secrets')
-const { User } = require('../../db')
 const { fetchUserFromJwt } = require('../../middleware')
 module.exports = router
 
