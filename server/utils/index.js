@@ -18,7 +18,7 @@ const sendTokenizedEmail = async (to, token) => {
     text: 'Please click this link to continue signing in to Streams',
     html: `
       <div>
-        <a href=${`http://localhost:3001/api/v0/auth/magic-link?token=${token}`}>
+        <a href=${`http://localhost:3000/auth/magic-link?token=${token}`}>
           Sign in
         </a>
       </div>`
