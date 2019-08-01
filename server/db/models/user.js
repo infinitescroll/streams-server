@@ -10,6 +10,78 @@ const userSchema = new Schema({
     required: [true, "can't be blank"],
     match: [/\S+@\S+\.\S+/, 'is invalid'],
     index: true
+  },
+  apps: {
+    trello: {
+      username: {
+        type: String
+      },
+      accessToken: {
+        type: String
+      },
+      refreshToken: {
+        type: String
+      },
+      profile: {
+        type: Object
+      }
+    },
+    slack: {
+      username: {
+        type: String
+      },
+      accessToken: {
+        type: String
+      },
+      refreshToken: {
+        type: String
+      },
+      profile: {
+        type: Object
+      }
+    },
+    dropbox: {
+      username: {
+        type: String
+      },
+      accessToken: {
+        type: String
+      },
+      refreshToken: {
+        type: String
+      },
+      profile: {
+        type: Object
+      }
+    },
+    arena: {
+      username: {
+        type: String
+      },
+      accessToken: {
+        type: String
+      },
+      refreshToken: {
+        type: String
+      },
+      profile: {
+        type: Object
+      }
+    },
+    github: {
+      username: {
+        type: String
+      },
+      accessToken: {
+        type: String
+      },
+      refreshToken: {
+        type: String
+      },
+      profile: {
+        type: Object
+      }
+    }
   }
 })
 
@@ -18,7 +90,7 @@ class UserClass {
     const user = await this.findOne({ email })
     if (user) return user
 
-    const newUser = await this.create({ email })
+    const newUser = await this.create({ email, apps: {} })
     return newUser
   }
 
