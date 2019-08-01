@@ -90,7 +90,7 @@ class UserClass {
     const user = await this.findOne({ email })
     if (user) return user
 
-    const newUser = await this.create({ email })
+    const newUser = await this.create({ email, apps: {} })
     return newUser
   }
 
