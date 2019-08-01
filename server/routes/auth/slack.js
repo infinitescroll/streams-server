@@ -41,7 +41,7 @@ router.put('/', (req, res) => {
           res.status(200).send(obj)
         })
         .catch(err => {
-          res.status(400).send(err)
+          next(err)
         })
     })
   })
