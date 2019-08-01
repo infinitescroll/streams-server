@@ -4,7 +4,7 @@ const { ARENA_CLIENT_ID, ARENA_CLIENT_SECRET } = require('../../../secrets')
 const { User } = require('../../db')
 module.exports = router
 
-router.get('/', function(req, res) {
+router.put('/', function(req, res) {
   if (!req.user || !req.user._id) return res.status(400).send('No user')
   if (!req.query.code) return res.status(400).send('No code')
 

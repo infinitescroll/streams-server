@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const request = require('request')
-const { SLACK_CLIENT_ID, SLACK_CLIENT_SECRET } = require('../../../secrets')
+const { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } = require('../../../secrets')
 const { User } = require('../../db')
 module.exports = router
 
@@ -9,30 +9,28 @@ router.put('/', (req, res) => {
   if (!req.query.code) return res.status(400).send('No code')
 
   const url =
-    'https://slack.com/api/oauth.access?client_id=' +
-    SLACK_CLIENT_ID +
+    'https://github.com/login/oauth/access_token?client_id=' +
+    GITHUB_CLIENT_ID +
     '&client_secret=' +
-    SLACK_CLIENT_SECRET +
+    GITHUB_CLIENT_SECRET +
     '&code=' +
     req.query.code +
-    '&redirect_uri=http://localhost:3000/authorize/app/slack'
+    '&redirect_uri=http://localhost:3000/authorize/app/github'
 
-  request(url, function(error, response, body) {
+  request.post(url, {}, (error, response, body) => {
     if (error) return res.status(400).send(error)
-    body = JSON.parse(body)
-    if (!body || !body.access_token) {
-      return res.status(400).send('No dice')
-    }
+    if (!body) return res.status(400).send('No. body.')
+
+    const token = body.substring(body.indexOf('=') + 1, body.indexOf('&'))
+    if (!token) return res.status(400).send('No dice')
 
     User.findOne({ _id: req.user._id }, (err, user) => {
       if (err) res.status(500).send(err)
-      if (!user) res.status(404).send()
+      if (!user) res.status(400).send('No user found')
       if (!user.apps) user.apps = {}
 
-      user.apps.slack = {
-        profile: body.user,
-        username: body.user.name,
-        accessToken: body.access_token
+      user.apps.github = {
+        accessToken: token
       }
 
       user

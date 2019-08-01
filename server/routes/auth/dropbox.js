@@ -4,7 +4,7 @@ const { DROPBOX_CLIENT_ID, DROPBOX_CLIENT_SECRET } = require('../../../secrets')
 const { User } = require('../../db')
 module.exports = router
 
-router.get('/', (req, res) => {
+router.put('/', (req, res) => {
   if (!req.user || !req.user._id) return res.status(400).send('No user')
   if (!req.query.code) return res.status(400).send('No code')
   const url = 'https://api.dropbox.com/oauth2/token'
