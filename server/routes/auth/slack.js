@@ -1,13 +1,10 @@
 const router = require('express').Router()
 const request = require('request')
 const { SLACK_CLIENT_ID, SLACK_CLIENT_SECRET } = require('../../../secrets')
-const { User } = require('../../db')
+const { fetchUserFromJwt } = require('../../middleware')
 module.exports = router
 
-router.put('/', (req, res) => {
-  if (!req.user || !req.user._id) return res.status(400).send('No user')
-  if (!req.query.code) return res.status(400).send('No code')
-
+router.put('/', fetchUserFromJwt, (req, res, next) => {
   const url =
     'https://slack.com/api/oauth.access?client_id=' +
     SLACK_CLIENT_ID +
@@ -17,32 +14,22 @@ router.put('/', (req, res) => {
     req.query.code +
     '&redirect_uri=http://localhost:3000/authorize/app/slack'
 
-  request(url, function(error, response, body) {
-    if (error) return res.status(400).send(error)
+  request(url, (error, response, body) => {
+    if (error) return next(error)
     body = JSON.parse(body)
     if (!body || !body.access_token) {
       return res.status(400).send('No dice')
     }
 
-    User.findOne({ _id: req.user._id }, (err, user) => {
-      if (err) res.status(500).send(err)
-      if (!user) res.status(404).send()
-      if (!user.apps) user.apps = {}
+    req.user.apps.slack = {
+      profile: body.user,
+      username: body.user.name,
+      accessToken: body.access_token
+    }
 
-      user.apps.slack = {
-        profile: body.user,
-        username: body.user.name,
-        accessToken: body.access_token
-      }
-
-      user
-        .save()
-        .then(obj => {
-          res.status(200).send(obj)
-        })
-        .catch(err => {
-          next(err)
-        })
-    })
+    req.user
+      .save()
+      .then(obj => res.status(204).send(obj))
+      .catch(err => res.status(400).send(err))
   })
 })
