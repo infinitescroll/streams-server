@@ -5,6 +5,7 @@ const cors = require('cors')
 const morgan = require('morgan')
 const compression = require('compression')
 const mongoose = require('mongoose')
+const events = require('./events')
 const PORT = process.env.PORT || 3001
 const app = express()
 module.exports = app
@@ -85,6 +86,7 @@ const startDb = () => {
 }
 
 async function bootApp() {
+  events()
   await startDb()
 }
 // This evaluates as true when this file is run directly from the command line,
