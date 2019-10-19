@@ -8,6 +8,9 @@ const eventSchema = new Schema({
   data: {
     type: Object
   },
+  parent: {
+    type: String
+  },
   createdAt: {
     type: String
   }
