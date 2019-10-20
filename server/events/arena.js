@@ -7,7 +7,7 @@ const getNewEvents = async (latestDate, slug, dbObjs = []) => {
 
   channel.contents.forEach(item => {
     if (item.created_at > latestDate) {
-      dbObjs.push({data: item, app: 'arena', parent: slug, createdAt: item.created_at})
+      dbObjs.push({ data: item, app: 'arena', parent: slug, createdAt: item.created_at })
     }
   })
 
@@ -18,14 +18,14 @@ const updateEvents = async () => {
   try {
     const slugs = ['audio-lpxcumx6hly', 'streams-p6xplfgv8nw']
 
-    slugs.forEach(async item => { 
-      const lastEventSaved = await Event.findOne({ parent: item }, {}, { sort : { 'createdAt' : -1 } })
+    slugs.forEach(async item => {
+      const lastEventSaved = await Event.findOne({ parent: item }, {}, { sort: { 'createdAt': -1 } })
       const date = lastEventSaved ? lastEventSaved.createdAt : ''
       const newEvents = await getNewEvents(date, item)
 
       if (newEvents.length > 0) {
-          const docs = await Event.create(newEvents)
-          console.log(docs.length, 'arena events added in', item)
+        const docs = await Event.create(newEvents)
+        console.log(docs.length, 'arena events added in', item)
       } else {
         console.log('no new arena events in', item)
       }

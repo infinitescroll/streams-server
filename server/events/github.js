@@ -7,7 +7,7 @@ const getNewEvents = async (latestDate, dbObjs = [], page = 1) => {
 
   events.forEach(item => {
     if (item.created_at > latestDate) {
-      dbObjs.push({data: item, app: 'github', createdAt: item.created_at})
+      dbObjs.push({ data: item, app: 'github', createdAt: item.created_at })
     }
   })
 
@@ -17,27 +17,25 @@ const getNewEvents = async (latestDate, dbObjs = [], page = 1) => {
 
 const fillDB = async () => {
   const dbObjs = []
-  const res = await fetch(`https://api.github.com/orgs/openworklabs/events?per_page=10`)
+  const res = await fetch(`https://api.github.com/orgs/openworklabs/events?per_page=99`)
   const events = await res.json()
 
   events.forEach(item => {
-    dbObjs.push({data: item, app: 'github', createdAt: item.created_at})
+    dbObjs.push({ data: item, app: 'github', createdAt: item.created_at })
   })
 
   const docs = await Event.create(dbObjs)
-  console.log('docs', docs)
 }
 
 const updateEvents = async () => {
   try {
-    const lastEventSaved = await Event.findOne({}, {}, { sort : { 'createdAt' : -1 } })
+    const lastEventSaved = await Event.findOne({}, {}, { sort: { 'createdAt': -1 } })
     if (!lastEventSaved) return fillDB()
 
-    console.log('lastEventSaved.createdAt', lastEventSaved.createdAt)
     const newEvents = await getNewEvents(lastEventSaved.createdAt)
     if (newEvents.length > 0) {
-        const docs = await Event.create(newEvents)
-        console.log(docs.length, 'github events added')
+      const docs = await Event.create(newEvents)
+      console.log(docs.length, 'github events added')
     } else {
       console.log('no new github events')
     }
