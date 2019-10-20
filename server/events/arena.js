@@ -27,7 +27,7 @@ const updateEvents = async () => {
         const docs = await Event.create(newEvents)
         console.log(docs.length, 'arena events added in', item)
       } else {
-        console.log('no new arena events in', item)
+        console.log('No new arena events in', item)
       }
     })
   } catch (error) {

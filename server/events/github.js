@@ -38,7 +38,7 @@ const updateEvents = async () => {
       const docs = await Event.create(newEvents)
       console.log(docs.length, 'github events added')
     } else {
-      console.log('no new github events')
+      console.log('No new github events')
     }
   } catch (error) {
     console.error('Error updating github events: ', error)

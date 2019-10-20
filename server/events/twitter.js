@@ -38,7 +38,7 @@ const updateEvents = async () => {
       const docs = await Event.create(newEvents)
       console.log(docs.length, 'tweets added')
     } else {
-      console.log('no tweets added')
+      console.log('No tweets added')
     }
   } catch (error) {
     console.error('Error updating arena events: ', error)
