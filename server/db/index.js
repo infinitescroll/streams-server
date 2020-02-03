@@ -1,8 +1,9 @@
 const models = require('./models')
 
-const { User, Event } = models
+const { User, Event, Stream } = models
 
 module.exports = {
   User,
-  Event
+  Event,
+  Stream
 }
