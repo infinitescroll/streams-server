@@ -1,6 +1,8 @@
 const nodemailer = require('nodemailer')
 const jwt = require('jsonwebtoken')
-const { EMAIL, loginSecretKey } = require('../../secrets')
+// const { EMAIL, loginSecretKey } = require('../../secrets')
+const EMAIL = 'test'
+const loginSecretKey = 'test'
 
 const sendTokenizedEmail = async (to, token) => {
   const transporter = nodemailer.createTransport({
