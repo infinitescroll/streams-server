@@ -2,25 +2,12 @@
   "name": "streams-server",
   "version": "0.0.1",
   "description": "a server to manage stream integrations",
-  "engines": {
-    "node": ">= 7.0.0"
-  },
   "main": "index.js",
   "scripts": {
-    "deploy": "script/deploy",
-    "heroku-token": "script/encrypt-heroku-auth-token",
-    "lint": "eslint ./ --ignore-path .gitignore",
-    "lint-fix": "npm run lint -- --fix",
-    "precommit": "lint-staged",
-    "prepare": "if [ -d .git ]; then npm-merge-driver install; fi",
-    "postinstall": "touch secrets.js",
-    "seed": "node script/seed.js",
     "start": "node server",
-    "start-dev": "NODE_ENV='development' npm run start-server",
-    "start-server": "nodemon server -e html,js,scss --ignore public --ignore client",
     "test": "NODE_ENV='test' && ava"
   },
-  "author": "Fullstack Academy of Code",
+  "author": "Open Work Labs",
   "license": "MIT",
   "dependencies": {
     "axios": "^0.18.1",
