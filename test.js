@@ -10,7 +10,7 @@ const testStream = {
   name: 'Test stream',
   feeds: [
     {
-      parent: '123',
+      parent: 'openworklabs/streams-server',
       app: 'GitHub',
       filters: {
         timeFrame: 'day',
