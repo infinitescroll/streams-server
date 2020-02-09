@@ -17,8 +17,12 @@ const initEventsUpdater = async () => {
           { sort: { createdAt: -1 } }
         )
 
+        const lastEventSavedDate = lastEventSaved
+          ? lastEventSaved.createdAt
+          : null
+
         stream.feeds.map(async feed => {
-          github(feed.parent, stream._id, lastEventSaved.createdAt)
+          github(feed.parent, stream._id, lastEventSavedDate)
         })
       })
     )
