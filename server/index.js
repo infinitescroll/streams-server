@@ -5,7 +5,7 @@ const cors = require('cors')
 const morgan = require('morgan')
 const compression = require('compression')
 const mongoose = require('mongoose')
-const events = require('./events')
+const initEventsUpdater = require('./events')
 const PORT = process.env.PORT || 3001
 require('dotenv').config({ path: __dirname + '/.env' })
 
@@ -72,7 +72,7 @@ const startDb = () => {
 }
 
 async function bootApp() {
-  events()
+  initEventsUpdater()
   await startDb()
 }
 // This evaluates as true when this file is run directly from the command line,

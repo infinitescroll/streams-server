@@ -2,7 +2,7 @@ const test = require('ava')
 const { Stream } = require('./server/db')
 
 test('Create a stream', async t => {
-  const stream = new Stream({
+  const stream = await Stream.create({
     name: 'Test stream',
     feeds: [
       {

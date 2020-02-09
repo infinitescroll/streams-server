@@ -2,13 +2,27 @@ const github = require('./github')
 const arena = require('./arena')
 const twitter = require('./twitter')
 const Scheduler = require('../scheduler')
+const { Stream, Event } = require('../db/models')
 
-const getEvents = async () => {
+const initEventsUpdater = async () => {
   new Scheduler(async () => {
-    github()
-    arena()
-    twitter()
-  }, 20000)
+    const streams = await Stream.find()
+    await Promise.all(
+      streams.map(async stream => {
+        if (!stream.feeds) return
+
+        const lastEventSaved = await Event.findOne(
+          { streamID: stream._id },
+          {},
+          { sort: { createdAt: -1 } }
+        )
+
+        stream.feeds.map(async feed => {
+          github(feed.parent, stream._id, lastEventSaved.createdAt)
+        })
+      })
+    )
+  }, 5000)
 }
 
-module.exports = getEvents
+module.exports = initEventsUpdater
