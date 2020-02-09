@@ -12,7 +12,7 @@ require('dotenv').config({ path: __dirname + '/.env' })
 const app = express()
 module.exports = app
 
-const createApp = () => {
+const createApp = async () => {
   // logging middleware
   app.use(morgan('dev'))
 
