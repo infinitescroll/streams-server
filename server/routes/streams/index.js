@@ -1,6 +1,5 @@
 const router = require('express').Router()
-const { Stream } = require('../../db')
-const { fetchUserFromJwt } = require('../../middleware')
+const { Event, Stream } = require('../../db')
 module.exports = router
 
 router.post('/', async (req, res) => {
@@ -39,6 +38,61 @@ router.delete('/:id', async (req, res) => {
       res.status(404).send()
     }
   } catch (error) {
+    res.status(400).send(error)
+  }
+})
+
+router.get('/:id/events', async (req, res) => {
+  const stream = await Stream.findById(req.params.id)
+  if (!stream) return
+
+  let events
+  const queryObj = {
+    streamID: req.params.id
+  }
+  const andArray = []
+
+  try {
+    if (Object.entries(req.query).length === 0) {
+      if (stream.feeds && stream.feeds[0] && stream.feeds[0].filters) {
+        const timeFrame = stream.feeds[0].filters.timeFrame
+        if (timeFrame) {
+          let cutoff = new Date()
+          if (stream.feeds[0].filters.timeFrame === 'day') {
+            cutoff.setDate(cutoff.getDate() - 1)
+          }
+          andArray.push({ createdAt: { $gt: cutoff } })
+        }
+
+        const types = stream.feeds[0].filters.types
+        if (types) {
+          const typesOrArray = []
+          types.forEach(type => typesOrArray.push({ type }))
+          andArray.push({ $or: typesOrArray })
+        }
+
+        const usernames = stream.feeds[0].filters.usernames
+        if (usernames) {
+          const usernamesOrArray = []
+          usernames.forEach(username =>
+            usernamesOrArray.push({
+              username: username
+            })
+          )
+          andArray.push({ $or: usernamesOrArray })
+        }
+      }
+
+      if (andArray.length > 0) {
+        events = await Event.find(queryObj).and(andArray)
+      } else {
+        events = await Event.find(queryObj)
+      }
+    }
+
+    res.status(200).send(events)
+  } catch (error) {
+    console.log('error', error)
     res.status(400).send(error)
   }
 })

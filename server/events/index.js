@@ -26,7 +26,7 @@ const initEventsUpdater = async () => {
         })
       })
     )
-  }, 5000)
+  }, 20000)
 }
 
 module.exports = initEventsUpdater

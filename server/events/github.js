@@ -7,13 +7,14 @@ const fillDB = async (repoName, streamID) => {
     `https://api.github.com/repos/${repoName}/events?per_page=10&client_id=${process.env.GITHUB_CLIENT_ID}&client_secret=${process.env.GITHUB_CLIENT_SECRET}`
   )
   const events = await res.json()
-
   events.forEach(item => {
     dbObjs.push({
       data: item,
       streamID: streamID,
       app: 'github',
-      createdAt: item.created_at
+      username: item.actor.login,
+      type: item.type,
+      createdAt: new Date(item.created_at)
     })
   })
 
@@ -34,12 +35,12 @@ const getNewEvents = async (
   const events = await res.json()
 
   events.forEach(item => {
-    if (item.created_at > latestDate) {
+    if (new Date(item.created_at) > latestDate) {
       dbObjs.push({
         data: item,
         streamID: streamID,
         app: 'github',
-        createdAt: item.created_at
+        createdAt: new Date(item.created_at)
       })
     }
   })

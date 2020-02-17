@@ -10,7 +10,7 @@ const streamSchema = new Schema({
       filters: {
         timeFrame: String,
         types: [String],
-        by: [String],
+        usernames: [String],
         subFeeds: [String]
       }
     }

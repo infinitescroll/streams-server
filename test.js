@@ -14,8 +14,8 @@ const testStream = {
       app: 'GitHub',
       filters: {
         timeFrame: 'day',
-        types: ['commits'],
-        by: ['listenaddress'],
+        types: ['IssueCommentEvent'],
+        usernames: ['listenaddress'],
         subFeeds: ['primary']
       }
     }
@@ -55,7 +55,7 @@ test.serial('Create a stream', async t => {
 
   t.is(stream.name, 'Test stream')
   t.is(stream.feeds[0].app, 'GitHub')
-  t.is(stream.feeds[0].filters.types[0], 'commits')
+  t.is(stream.feeds[0].filters.types[0], 'IssueCommentEvent')
 })
 
 test.serial('POST /stream', async t => {
