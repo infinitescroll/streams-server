@@ -8,14 +8,24 @@ const fillDB = async (repoName, streamID) => {
   )
   const events = await res.json()
   events.forEach(item => {
-    dbObjs.push({
+    const event = {
       data: item,
       streamID: streamID,
       app: 'github',
       username: item.actor.login,
       type: item.type,
       createdAt: new Date(item.created_at)
-    })
+    }
+
+    if (item.payload && item.payload.ref) {
+      event.subParent = item.payload.ref
+    }
+
+    if (item.actor && item.actor.login) {
+      event.username = item.actor.login
+    }
+
+    dbObjs.push(event)
   })
 
   const docs = await Event.create(dbObjs)

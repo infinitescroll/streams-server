@@ -81,6 +81,14 @@ router.get('/:id/events', async (req, res) => {
           )
           andArray.push({ $or: usernamesOrArray })
         }
+
+        const subParents = stream.feeds[0].filters.subParents
+        if (subParents) {
+          const subParentsOrArray = []
+          subParents.forEach(subParent => subParentsOrArray.push({ subParent }))
+          subParentsOrArray.push({ subParent: null })
+          andArray.push({ $or: subParentsOrArray })
+        }
       }
 
       if (andArray.length > 0) {

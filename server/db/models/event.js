@@ -8,6 +8,7 @@ const eventSchema = new Schema({
   username: String,
   type: String,
   parent: String,
+  subParent: { type: String, default: null },
   createdAt: Date
 })
 

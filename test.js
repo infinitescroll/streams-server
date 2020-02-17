@@ -14,8 +14,9 @@ const testStream = {
       app: 'GitHub',
       filters: {
         timeFrame: 'day',
-        types: ['IssueCommentEvent'],
+        types: ['IssueCommentEvent', 'PushEvent'],
         usernames: ['listenaddress'],
+        subParents: ['refs/heads/primary'],
         subFeeds: ['primary']
       }
     }
