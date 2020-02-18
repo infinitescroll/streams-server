@@ -50,6 +50,8 @@ const getNewEvents = async (
         data: item,
         streamID: streamID,
         app: 'github',
+        username: item.actor.login,
+        type: item.type,
         createdAt: new Date(item.created_at)
       })
     }

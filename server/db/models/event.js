@@ -12,8 +12,4 @@ const eventSchema = new Schema({
   createdAt: Date
 })
 
-eventSchema.methods.getFilteredEvents = function(filters) {
-  return this.model('Events').find(filters, cb)
-}
-
 module.exports = mongoose.model('Events', eventSchema)
