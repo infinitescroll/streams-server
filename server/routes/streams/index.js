@@ -44,7 +44,7 @@ router.delete('/:id', async (req, res) => {
 
 router.get('/:id/events', async (req, res) => {
   const stream = await Stream.findById(req.params.id)
-  if (!stream) return res.status(404)
+  if (!stream) return res.status(404).send()
   if (!stream.feeds || !stream.feeds[0])
     return res.status(404).send('This stream has no feeds.')
 
@@ -57,6 +57,17 @@ router.get('/:id/events', async (req, res) => {
   try {
     if (Object.entries(req.query).length === 0) {
       events = await stream.getFilteredEvents(stream.feeds[0].filters)
+    } else {
+      const queryObj = {}
+      Object.entries(req.query).forEach(param => {
+        if (param[0] !== 'timeFrame') {
+          queryObj[param[0]] = param[1].split(',')
+        } else {
+          queryObj[param[0]] = param[1]
+        }
+      })
+
+      events = await stream.getFilteredEvents(queryObj)
     }
 
     res.status(200).send(events)

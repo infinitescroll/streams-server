@@ -25,33 +25,29 @@ streamSchema.methods.getFilteredEvents = async function(filters) {
   if (filters) {
     const andArray = []
 
-    const timeFrame = filters.timeFrame
-    if (timeFrame) {
+    if (filters.timeFrame) {
       let cutoff = new Date()
-      if (timeFrame === 'day') {
-        cutoff.setDate(cutoff.getDate() - 1)
-      }
+      if (filters.timeFrame === 'day') cutoff.setDate(cutoff.getDate() - 1)
       andArray.push({ createdAt: { $gt: cutoff } })
     }
 
-    const types = filters.types
-    if (types) {
+    if (filters.types) {
       const typesOrArray = []
-      types.forEach(type => typesOrArray.push({ type }))
+      filters.types.forEach(type => typesOrArray.push({ type }))
       andArray.push({ $or: typesOrArray })
     }
 
-    const usernames = filters.usernames
-    if (usernames) {
+    if (filters.usernames) {
       const usernamesOrArray = []
-      usernames.forEach(username => usernamesOrArray.push({ username }))
+      filters.usernames.forEach(username => usernamesOrArray.push({ username }))
       andArray.push({ $or: usernamesOrArray })
     }
 
-    const subParents = filters.subParents
-    if (subParents) {
+    if (filters.subParents) {
       const subParentsOrArray = []
-      subParents.forEach(subParent => subParentsOrArray.push({ subParent }))
+      filters.subParents.forEach(subParent =>
+        subParentsOrArray.push({ subParent })
+      )
       subParentsOrArray.push({ subParent: null })
       andArray.push({ $or: subParentsOrArray })
     }
