@@ -6,7 +6,7 @@ const userSchema = new Schema({
   email: {
     type: String,
     lowercase: true,
-    unique: true,
+    // unique: true,
     // required: [true, "can't be blank"],
     match: [/\S+@\S+\.\S+/, 'is invalid']
     // index: true
@@ -48,6 +48,18 @@ const userSchema = new Schema({
   }
 })
 
+const getUserToReturn = user => {
+  return {
+    _id: user._id,
+    username: user.username,
+    apps: {
+      github: {
+        profile: user.apps.github.profile
+      }
+    }
+  }
+}
+
 class UserClass {
   static async findOrCreate(email) {
     const user = await this.findOne({ email })
@@ -58,11 +70,12 @@ class UserClass {
   }
 
   static async findByUsernameOrCreate({ username, apps }) {
-    const user = await this.findOne({ username })
-    if (user) return user
+    let user
+    user = await this.findOne({ username })
+    if (user) return { user: getUserToReturn(user), created: false }
 
-    const newUser = await this.create({ username, apps })
-    return newUser
+    user = await this.create({ username, apps })
+    return { user: getUserToReturn(user), created: true }
   }
 
   static async findByJWT(jwt) {

@@ -1,9 +1,10 @@
 const router = require('express').Router()
 const request = require('request')
 const { User } = require('../../db')
+const bent = require('bent')
 module.exports = router
 
-router.put('/', (req, res, next) => {
+router.put('/', async (req, res, next) => {
   const url =
     'https://github.com/login/oauth/access_token?client_id=' +
     process.env.GITHUB_CLIENT_ID +
@@ -13,43 +14,31 @@ router.put('/', (req, res, next) => {
     req.query.code +
     '&redirect_uri=http://localhost:3000/authorize/app/github'
 
-  request.post(url, {}, (error, response, body) => {
-    if (error) return res.status(400).send(error)
-    if (!body) return res.status(400).send('No. body.')
+  try {
+    const post = bent('POST', 'json', { 'Content-Type': 'application/json' })
+    const { access_token } = await post(url)
 
-    const token = body.substring(body.indexOf('=') + 1, body.indexOf('&'))
-    if (token === 'bad_verification_code')
-      return res.status(400).send('bad_verification_code')
-    if (!token) return res.status(400).send('No dice')
+    const get = bent('GET', 'json', {
+      'Content-Type': 'application/json',
+      Authorization: 'token ' + access_token,
+      'User-Agent': 'Streams'
+    })
 
-    request(
-      {
-        url: 'https://api.github.com/user',
-        headers: {
-          Authorization: 'token ' + token,
-          'User-Agent': 'Streams'
-        }
-      },
-      async (error, _, profile) => {
-        if (error) return res.status(400).send(error)
-        try {
-          const user = await User.findByUsernameOrCreate({
-            username: profile.login,
-            apps: {
-              github: {
-                accessToken: token,
-                profile: {
-                  ...body
-                }
-              }
-            }
-          })
+    const profile = await get('https://api.github.com/user')
 
-          return user
-        } catch (error) {
-          return res.status(400).send(error)
+    const { user, created } = await User.findByUsernameOrCreate({
+      username: profile.login,
+      apps: {
+        github: {
+          accessToken: access_token,
+          profile
         }
       }
-    )
-  })
+    })
+
+    const statusCode = created ? 201 : 200
+    return res.status(statusCode).send(user)
+  } catch (error) {
+    return res.status(400).send(error)
+  }
 })

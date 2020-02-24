@@ -11,6 +11,7 @@
   "license": "MIT",
   "dependencies": {
     "axios": "^0.18.1",
+    "bent": "^7.1.0",
     "compression": "^1.7.3",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
