@@ -1,33 +1,44 @@
 const router = require('express').Router()
 const request = require('request')
-const { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET } = require('../../../secrets')
-const { fetchUserFromJwt } = require('../../middleware')
+const { User } = require('../../db')
+const bent = require('bent')
 module.exports = router
 
-router.put('/', fetchUserFromJwt, (req, res, next) => {
+router.put('/', async (req, res, next) => {
   const url =
     'https://github.com/login/oauth/access_token?client_id=' +
-    GITHUB_CLIENT_ID +
+    process.env.GITHUB_CLIENT_ID +
     '&client_secret=' +
-    GITHUB_CLIENT_SECRET +
+    process.env.GITHUB_CLIENT_SECRET +
     '&code=' +
     req.query.code +
     '&redirect_uri=http://localhost:3000/authorize/app/github'
 
-  request.post(url, {}, (error, response, body) => {
-    if (error) return res.status(400).send(error)
-    if (!body) return res.status(400).send('No. body.')
+  try {
+    const post = bent('POST', 'json', { 'Content-Type': 'application/json' })
+    const { access_token } = await post(url)
 
-    const token = body.substring(body.indexOf('=') + 1, body.indexOf('&'))
-    if (!token) return res.status(400).send('No dice')
+    const get = bent('GET', 'json', {
+      'Content-Type': 'application/json',
+      Authorization: 'token ' + access_token,
+      'User-Agent': 'Streams'
+    })
 
-    req.user.apps.github = {
-      accessToken: token
-    }
+    const profile = await get('https://api.github.com/user')
 
-    req.user
-      .save()
-      .then(obj => res.status(200).send(obj))
-      .catch(err => next(err))
-  })
+    const { user, created } = await User.findByUsernameOrCreate({
+      username: profile.login,
+      apps: {
+        github: {
+          accessToken: access_token,
+          profile
+        }
+      }
+    })
+
+    const statusCode = created ? 201 : 200
+    return res.status(statusCode).send(user)
+  } catch (error) {
+    return res.status(400).send(error)
+  }
 })
