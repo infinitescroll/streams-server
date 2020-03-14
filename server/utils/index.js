@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer')
 const jwt = require('jsonwebtoken')
 // const { EMAIL, loginSecretKey } = require('../../secrets')
-const EMAIL = 'test'
+const EMAIL = { user: 'email here', pass: 'app password here' }
 const loginSecretKey = 'test'
 
 const sendTokenizedEmail = async (to, token) => {
@@ -9,7 +9,7 @@ const sendTokenizedEmail = async (to, token) => {
     service: 'Gmail',
     auth: {
       user: EMAIL.user,
-      pass: EMAIL.password
+      pass: EMAIL.pass
     }
   })
 
