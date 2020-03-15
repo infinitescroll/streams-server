@@ -1,10 +1,14 @@
 const router = require('express').Router()
-const { Event, Stream } = require('../../db')
+const { Event, Stream, User } = require('../../db')
 module.exports = router
 
 router.post('/', async (req, res) => {
   try {
     const stream = await Stream.create(req.body)
+    await User.findByIdAndUpdate(stream.teamIDs[0], {
+      $push: { streamIDs: stream._id }
+    })
+
     res.status(201).send(stream)
   } catch (error) {
     res.status(400).send(error)
