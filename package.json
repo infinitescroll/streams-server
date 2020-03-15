@@ -4,13 +4,13 @@
   "description": "a server to manage stream integrations",
   "main": "index.js",
   "scripts": {
+    "dev": "nodemon server",
     "start": "node server",
     "test": "ava"
   },
   "author": "Open Work Labs",
   "license": "MIT",
   "dependencies": {
-    "axios": "^0.18.1",
     "bent": "^7.1.0",
     "compression": "^1.7.3",
     "cors": "^2.8.5",

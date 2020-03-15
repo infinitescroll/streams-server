@@ -1,8 +1,6 @@
 const nodemailer = require('nodemailer')
 const jwt = require('jsonwebtoken')
-// const { EMAIL, loginSecretKey } = require('../../secrets')
-const EMAIL = 'test'
-const loginSecretKey = 'test'
+const { EMAIL, loginSecretKey } = require('../../secrets')
 
 const sendTokenizedEmail = async (to, token) => {
   const transporter = nodemailer.createTransport({
@@ -20,7 +18,7 @@ const sendTokenizedEmail = async (to, token) => {
     text: 'Please click this link to continue signing in to Streams',
     html: `
       <div>
-        <a href=${`http://localhost:3000/auth/magic-link?token=${token}`}>
+        <a href=${`http://localhost:3000/start/2?token=${token}`}>
           Sign in
         </a>
       </div>`
