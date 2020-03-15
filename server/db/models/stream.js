@@ -17,7 +17,7 @@ const streamSchema = new Schema({
     }
   ],
   createdAt: String,
-  teamIDs: [Schema.Types.ObjectId]
+  userIDs: [{ type: Schema.Types.ObjectId, ref: 'Users', default: [] }]
 })
 
 streamSchema.methods.getFilteredEvents = async function(filters) {

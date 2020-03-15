@@ -12,8 +12,7 @@ const userSchema = new Schema({
     match: [/\S+@\S+\.\S+/, 'is invalid'],
     index: true
   },
-  streamIDs: [Schema.Types.ObjectId],
-  username: String,
+  streamIDs: [{ type: Schema.Types.ObjectId, ref: 'Streams', default: [] }],
   apps: {
     trello: {
       username: {
@@ -50,30 +49,14 @@ const userSchema = new Schema({
   }
 })
 
-const getStreams = async streamIDs => {
-  if (streamIDs.length < 1) return null
-
-  streams = []
-  await Promise.all(
-    streamIDs.map(async item => {
-      try {
-        const stream = await Stream.findById(item)
-        streams.push(stream)
-      } catch (error) {
-        console.error('Problem finding stream. ', error)
-      }
-    })
-  )
-
-  return streams
-}
+const getStreams = streamIDs =>
+  Promise.all(streamIDs.map(async id => Stream.findById(id)))
 
 const getUserToReturn = async user => {
   return {
     _id: user._id,
-    username: user.username,
-    streamIDs: user.streamIDs,
-    streams: user.streams,
+    email: user.email,
+    streams: await getStreams(user.streamIDs),
     apps: {
       github: {
         profile: user.apps.github.profile
@@ -93,23 +76,14 @@ class UserClass {
 
   static async findByJWT(jwt) {
     const { sub } = await verifyJWT(jwt)
-    const user = await this.findById(sub)
-
-    user.streams = await getStreams(user.streamIDs)
-    return await getUserToReturn(user)
+    return getUserToReturn(await this.findById(sub))
   }
 
-  // static async findByUsernameOrCreate({ username, apps }) {
-  //   const user = await this.findOne({ username })
-  //   if (user) {
-  //     const userToReturn = await getUserToReturn(user)
-  //     return { user: userToReturn, created: false }
-  //   }
-
-  //   const newUser = await this.create({ username, apps })
-  //   const newUserToReturn = await getUserToReturn(newUser)
-  //   return { user: newUserToReturn, created: true }
-  // }
+  static async addStream(userId, streamId) {
+    const user = await this.findById(userId)
+    user.streamIDs.push(streamId)
+    return user.save()
+  }
 }
 
 userSchema.loadClass(UserClass)

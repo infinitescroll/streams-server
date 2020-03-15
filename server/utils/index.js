@@ -7,7 +7,7 @@ const sendTokenizedEmail = async (to, token) => {
     service: 'Gmail',
     auth: {
       user: EMAIL.user,
-      pass: EMAIL.pass
+      pass: EMAIL.password
     }
   })
 

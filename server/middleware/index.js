@@ -4,8 +4,7 @@ const fetchUserFromJwt = async (req, res, next) => {
   if (req.headers.authorization) {
     try {
       const jwt = req.headers.authorization.split(' ')[1]
-      const user = await User.findByJWT(jwt)
-      req.user = user
+      req.user = await User.findByJWT(jwt)
       next()
     } catch (error) {
       next(error)
